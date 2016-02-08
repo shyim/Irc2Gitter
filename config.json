@@ -1,0 +1,14 @@
+{
+  "kornbluth.freenode.net": {
+    "nickname": "shyim",
+    "gitterNickname": "shyim-bot",
+    "gitterToken": "",
+    "gitterPmChannel": "shyim/freenode-pm",
+    "channels": [
+      {
+        "ircChannel": "#shyim",
+        "gitterChannel": "shyim/shopware-irc-bridge"
+      }
+    ]
+  }
+}

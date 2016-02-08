@@ -4,6 +4,7 @@
   "description": "Bridge between Gitter and Irc",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,6 +23,7 @@
   },
   "homepage": "https://github.com/shyim/gitter-irc-bridge#readme",
   "dependencies": {
-    "irc": "^0.4.1"
+    "irc": "^0.4.1",
+    "node-gitter": "^1.2.9"
   }
 }
