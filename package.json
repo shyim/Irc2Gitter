@@ -1,0 +1,27 @@
+{
+  "name": "gitter-irc-bridge",
+  "version": "1.0.0",
+  "description": "Bridge between Gitter and Irc",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shyim/gitter-irc-bridge.git"
+  },
+  "keywords": [
+    "gitter",
+    "irc",
+    "bridge"
+  ],
+  "author": "shyim",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shyim/gitter-irc-bridge/issues"
+  },
+  "homepage": "https://github.com/shyim/gitter-irc-bridge#readme",
+  "dependencies": {
+    "irc": "^0.4.1"
+  }
+}
