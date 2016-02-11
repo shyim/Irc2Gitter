@@ -41,7 +41,7 @@ Object.keys(config).forEach(function(key) {
      */
     ircClient.addListener('message', function (from, to, message) {
         if(typeof gitter.connectedChannels[to] != 'undefined' && from != config[key].nickname) {
-            gitter.connectedChannels[to].send(from + " : "  + message);
+            gitter.connectedChannels[to].send("**" + from + ":** "  + message);
         }
     });
 
@@ -71,7 +71,7 @@ Object.keys(config).forEach(function(key) {
         });
 
         ircClient.addListener('pm', function (from, message) {
-            pmChannel.send(from + ": " + message);
+            pmChannel.send("**" + from + ":** "  + message);
         });
     }
 });
