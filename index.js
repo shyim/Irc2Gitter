@@ -61,7 +61,13 @@ Object.keys(config).forEach(function(key) {
                     try {
                         if(message.model.fromUser.username != config[key].gitterNickname) {
                             var splitText = message.model.text.split(':');
-                            ircClient.say(splitText[0], splitText[1]);
+                            if(splitText.length > 1) {
+                                var message = "";
+                                for(var i = 1; i < splitText.length; i++) {
+                                    message = message + ":" + splitText[i];
+                                }
+                                ircClient.say(splitText[0], message);
+                            }
                         }
                     } catch(err) {
                         console.log(err);
