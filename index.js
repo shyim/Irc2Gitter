@@ -45,6 +45,19 @@ Object.keys(config).forEach(function(key) {
         }
     });
 
+   ircClient.addListener('join', function(channel, nick, message) {
+	if(typeof gitter.connectedChannels[channel] != 'undefined' && nick != ircClient.nick) {
+		gitter.connectedChannels[channel].send("**JOIN**: "  + nick);
+	}
+   });
+
+  ircClient.addListener('part', function(channel, nick, message) {
+        if(typeof gitter.connectedChannels[channel] != 'undefined' && nick != ircClient.nick) {
+                gitter.connectedChannels[channel].send("**LEAVE**: "  + nick);
+        }
+   });
+
+
     /**
      * Private Messages
      */
