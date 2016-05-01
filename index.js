@@ -8,7 +8,6 @@ const IrcClient = require('irc'),
 Object.keys(Config).forEach(function (key) {
     var gitter = new GitterClient(Config[key].gitterToken);
     gitter.connectedChannels = {};
-    console.log(Util.getIrcConfig(Config[key]));
     var ircClient = new IrcClient.Client(key, Config[key].nickname, Util.getIrcConfig(Config[key]));
 
     /**
@@ -25,7 +24,7 @@ Object.keys(Config).forEach(function (key) {
                     try {
                         if (message.model.fromUser.username != Config[key].gitterNickname) {
                             MessageParser.parseMessage(message.model.html, (message) => {
-                                ircClient.say(item.ircChannel, strip(message));
+                                ircClient.say(item.ircChannel, Strip(message));
                             });
                         }
                     } catch (err) {
