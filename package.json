@@ -23,7 +23,10 @@
   },
   "homepage": "https://github.com/shyim/gitter-irc-bridge#readme",
   "dependencies": {
+    "html-entities": "^1.2.0",
     "irc": "^0.5.0",
-    "node-gitter": "^1.2.11"
+    "node-gitter": "^1.2.11",
+    "request": "^2.72.0",
+    "strip": "^3.0.0"
   }
 }

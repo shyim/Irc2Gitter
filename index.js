@@ -1,30 +1,32 @@
-var fs = require('fs'),
-    irc = require('irc'),
-    Gitter = require('node-gitter'),
-    utilClass = require('./component/Util.js'),
-    config = JSON.parse(fs.readFileSync('config.json'));
+const IrcClient = require('irc'),
+    GitterClient = require('node-gitter'),
+    Util = require('./component/Util'),
+    MessageParser = require('./component/Message'),
+    Config = JSON.parse(require('fs').readFileSync('config.json')),
+    Strip = require('strip');
 
-var util = new utilClass();
-
-Object.keys(config).forEach(function (key) {
-    var gitter = new Gitter(config[key].gitterToken);
+Object.keys(Config).forEach(function (key) {
+    var gitter = new GitterClient(Config[key].gitterToken);
     gitter.connectedChannels = {};
-    var ircClient = new irc.Client(key, config[key].nickname, util.getIrcConfig(config[key]));
+    console.log(Util.getIrcConfig(Config[key]));
+    var ircClient = new IrcClient.Client(key, Config[key].nickname, Util.getIrcConfig(Config[key]));
 
     /**
      * Setup Gitter
      */
-    config[key].channels.forEach(function (item) {
-        gitter.rooms.join(item.gitterChannel, function (err, room) {
+    Config[key].channels.forEach((item) => {
+        gitter.rooms.join(item.gitterChannel, (err, room) => {
             gitter.connectedChannels[item.ircChannel] = room;
 
             var events = room.streaming().chatMessages();
 
-            events.on('chatMessages', function (message) {
+            events.on('chatMessages', (message) => {
                 if (message.operation == 'create') {
                     try {
-                        if (message.model.fromUser.username != config[key].gitterNickname) {
-                            ircClient.say(item.ircChannel, message.model.text);
+                        if (message.model.fromUser.username != Config[key].gitterNickname) {
+                            MessageParser.parseMessage(message.model.html, (message) => {
+                                ircClient.say(item.ircChannel, strip(message));
+                            });
                         }
                     } catch (err) {
                         console.log(err);
@@ -37,61 +39,60 @@ Object.keys(config).forEach(function (key) {
     /**
      * Setup Irc
      */
-    ircClient.on('message', function (from, to, message) {
-        if (typeof gitter.connectedChannels[to] != 'undefined' && from != config[key].nickname) {
+    ircClient.on('message', (from, to, message) => {
+        if (typeof gitter.connectedChannels[to] != 'undefined' && from != Config[key].nickname) {
             gitter.connectedChannels[to].send("**" + from + ":** " + message);
         }
     });
 
-    ircClient.on('join', function (channel, nick, message) {
+    ircClient.on('join', (channel, nick, message) => {
         if (typeof gitter.connectedChannels[channel] != 'undefined' && nick != ircClient.nick) {
             gitter.connectedChannels[channel].send("**JOIN**: " + nick);
         }
     });
 
-    ircClient.on('part', function (channel, nick, message) {
+    ircClient.on('part', (channel, nick, message) => {
         if (typeof gitter.connectedChannels[channel] != 'undefined' && nick != ircClient.nick) {
             gitter.connectedChannels[channel].send("**LEAVE**: " + nick);
         }
     });
 
-    ircClient.on('quit', function (nick, reason, channels, message) {
-        channels.forEach(function (channel) {
+    ircClient.on('quit', (nick, reason, channels, message) => {
+        channels.forEach((channel) => {
             if (typeof gitter.connectedChannels[channel] != 'undefined' && nick != ircClient.nick) {
                 gitter.connectedChannels[channel].send("**QUIT**: " + nick);
             }
         });
     });
 
-    ircClient.on('kick', function (channel, nick, by, reason) {
+    ircClient.on('kick', (channel, nick, by, reason) => {
         if (typeof gitter.connectedChannels[channel] != 'undefined' && nick != ircClient.nick) {
             gitter.connectedChannels[channel].send("**KICK**: " + nick.toString() + ' Reason: ' + reason.toString() + ', by: ' + by.toString());
         }
     });
 
-
     /**
      * Private Messages
      */
-    if (typeof config[key].gitterPmChannel != 'undefined') {
+    if (typeof Config[key].gitterPmChannel != 'undefined') {
         var pmChannel;
 
-        gitter.rooms.join(config[key].gitterPmChannel, function (err, room) {
+        gitter.rooms.join(Config[key].gitterPmChannel, (err, room) => {
             pmChannel = room;
 
             var events = room.streaming().chatMessages();
 
-            events.on('chatMessages', function (message) {
+            events.on('chatMessages', (message) => {
                 if (message.operation == 'create') {
                     try {
                         if (message.model.fromUser.username != config[key].gitterNickname) {
                             var splitText = message.model.text.split(':');
                             if (splitText.length > 1) {
-                                var message = "";
+                                var messageStr = "";
                                 for (var i = 1; i < splitText.length; i++) {
-                                    message = message + ":" + splitText[i];
+                                    messageStr = messageStr + ":" + splitText[i];
                                 }
-                                ircClient.say(splitText[0], message);
+                                ircClient.say(splitText[0], messageStr);
                             }
                         }
                     } catch (err) {
@@ -101,7 +102,7 @@ Object.keys(config).forEach(function (key) {
             });
         });
 
-        ircClient.addListener('pm', function (from, message) {
+        ircClient.addListener('pm', (from, message) => {
             pmChannel.send("**" + from + ":** " + message);
         });
     }

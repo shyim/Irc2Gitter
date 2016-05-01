@@ -7,10 +7,12 @@ class Util {
         }
 
         serverConfig.ircConfig.channels = this.getIrcChannels(serverConfig);
+
+        return serverConfig.ircConfig;
     }
     getIrcChannels(serverConfig) {
         var channels = [];
-        serverConfig.channels.forEach(function(item) {
+        serverConfig.channels.forEach((item) => {
             channels.push(item.ircChannel);
         });
 
@@ -18,4 +20,4 @@ class Util {
     }
 }
 
-module.exports = Util;
+module.exports = new Util;
