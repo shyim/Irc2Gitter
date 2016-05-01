@@ -12,10 +12,13 @@ class Message {
             var code = html.substring(indexStart + 6, indexEnd);
 
             dPaste.create(code, (url) => {
-                if (startString.trim().length == 0) { startString = '';}
-                if (endString.trim().length == 0) { endString = '';}
+                var string = '';
 
-                callback(startString + url + endString);
+                if(startString.trim().length > 0) {
+                    string = startString.trim() + ' ';
+                }
+
+                callback(string + url + ' ' + endString.trim());
             });
         } else {
             callback(false);
