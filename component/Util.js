@@ -10,6 +10,7 @@ class Util {
 
         return serverConfig.ircConfig;
     }
+
     getIrcChannels(serverConfig) {
         var channels = [];
         serverConfig.channels.forEach((item) => {

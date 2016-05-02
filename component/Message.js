@@ -3,9 +3,9 @@
 var dPaste = require("./dPaste.js");
 
 class Message {
-    getCode (html, callback) {
+    getCode(html, callback) {
         var indexStart = html.indexOf("<code>");
-        if(indexStart > -1) {
+        if (indexStart > -1) {
             var indexEnd = html.indexOf("</code>");
             var startString = html.substring(0, indexStart);
             var endString = html.substring(indexEnd + 7, html.length);
@@ -14,7 +14,7 @@ class Message {
             dPaste.create(code, (url) => {
                 var string = '';
 
-                if(startString.trim().length > 0) {
+                if (startString.trim().length > 0) {
                     string = startString.trim() + ' ';
                 }
 
@@ -25,9 +25,9 @@ class Message {
         }
     }
 
-    parseMessage (messageHtml, callback) {
+    parseMessage(messageHtml, callback) {
         this.getCode(messageHtml, (code) => {
-            if(code == false) {
+            if (code == false) {
                 callback(messageHtml);
             } else {
                 callback(code);
