@@ -6,7 +6,8 @@ const IrcClient = require('irc'),
     MessageParser = require('./Message'),
     Strip = require('strip'),
     Entities = require('html-entities').XmlEntities,
-    entities = new Entities();
+    entities = new Entities(),
+    request = require('request');
 
 class Gitter2Irc {
     constructor(host, ircConfig) {
@@ -49,6 +50,14 @@ class Gitter2Irc {
     }
 
     initIrcEvents() {
+        var channels = {};
+
+        this.ircConfig.channels.forEach((item) => {
+            if (typeof item['gitterActivityUrl'] != 'undefined') {
+                channels[item['ircChannel']] = item['gitterActivityUrl'];
+            }
+        });
+
         this.ircClient.on('message', (from, to, message) => {
             if (typeof this.connectedChannels[to] != 'undefined' && from != this.ircNick) {
                 this.connectedChannels[to].send("**" + from + ":** " + message);
@@ -56,28 +65,28 @@ class Gitter2Irc {
         });
 
         this.ircClient.on('join', (channel, nick, message) => {
-            if (typeof this.connectedChannels[channel] != 'undefined' && nick != this.ircNick) {
-                this.connectedChannels[channel].send("**JOIN**: " + nick);
+            if (typeof channels[channel] != 'undefined' && nick != this.ircNick) {
+                this.sendGitterWebhookMessage(channels[to], "**JOIN**: " + nick);
             }
         });
 
         this.ircClient.on('part', (channel, nick, message) => {
-            if (typeof this.connectedChannels[channel] != 'undefined' && nick != this.ircNick) {
-                this.connectedChannels[channel].send("**LEAVE**: " + nick);
+            if (typeof channels[channel] != 'undefined' && nick != this.ircNick) {
+                this.sendGitterWebhookMessage(channels[to], "**LEAVE**: " + nick);
             }
         });
 
         this.ircClient.on('quit', (nick, reason, channels, message) => {
             channels.forEach((channel) => {
-                if (typeof this.connectedChannels[channel] != 'undefined' && nick != this.ircNick) {
-                    this.connectedChannels[channel].send("**QUIT**: " + nick);
+                if (typeof channels[channel] != 'undefined' && nick != this.ircNick) {
+                    this.sendGitterWebhookMessage(channels[channel], "**QUIT**: " + nick);
                 }
             });
         });
 
         this.ircClient.on('kick', (channel, nick, by, reason) => {
-            if (typeof this.connectedChannels[channel] != 'undefined' && nick != this.ircNick) {
-                this.connectedChannels[channel].send("**KICK**: " + nick.toString() + ' Reason: ' + reason.toString() + ', by: ' + by.toString());
+            if (typeof channels[channel] != 'undefined' && nick != this.ircNick) {
+                this.sendGitterWebhookMessage(channels[channel], "**KICK**: " + nick.toString() + ' Reason: ' + reason.toString() + ', by: ' + by.toString());
             }
         });
     }
@@ -112,6 +121,14 @@ class Gitter2Irc {
 
         this.ircClient.addListener('pm', (from, message) => {
             pmChannel.send("**" + from + ":** " + message);
+        });
+    }
+
+    sendGitterWebhookMessage(url, message) {
+        request.post(url, {
+            formData: {
+                message: message
+            }
         });
     }
 }
