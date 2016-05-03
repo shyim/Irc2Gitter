@@ -126,7 +126,7 @@ class Gitter2Irc {
 
     sendGitterWebhookMessage(url, message) {
         request.post(url, {
-            formData: {
+            form: {
                 message: message
             }
         });
