@@ -66,13 +66,13 @@ class Gitter2Irc {
 
         this.ircClient.on('join', (channel, nick, message) => {
             if (typeof channels[channel] != 'undefined' && nick != this.ircNick) {
-                this.sendGitterWebhookMessage(channels[to], "**JOIN**: " + nick);
+                this.sendGitterWebhookMessage(channels[channel], "**JOIN**: " + nick);
             }
         });
 
         this.ircClient.on('part', (channel, nick, message) => {
             if (typeof channels[channel] != 'undefined' && nick != this.ircNick) {
-                this.sendGitterWebhookMessage(channels[to], "**LEAVE**: " + nick);
+                this.sendGitterWebhookMessage(channels[channel], "**LEAVE**: " + nick);
             }
         });
 
