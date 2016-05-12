@@ -1,5 +1,5 @@
 {
-  "name": "gitter-irc-bridge",
+  "name": "gitter2irc",
   "version": "1.0.0",
   "description": "Bridge between Gitter and Irc",
   "main": "index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shyim/gitter-irc-bridge.git"
+    "url": "git+https://github.com/shyim/Gitter2Irc.git"
   },
   "keywords": [
     "gitter",
@@ -17,11 +17,11 @@
     "bridge"
   ],
   "author": "shyim",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/shyim/gitter-irc-bridge/issues"
+    "url": "https://github.com/shyim/Gitter2Irc/issues"
   },
-  "homepage": "https://github.com/shyim/gitter-irc-bridge#readme",
+  "homepage": "https://github.com/shyim/Gitter2Irc",
   "dependencies": {
     "html-entities": "^1.2.0",
     "irc": "^0.5.0",
