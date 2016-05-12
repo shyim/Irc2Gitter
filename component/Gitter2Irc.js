@@ -36,8 +36,12 @@ class Gitter2Irc {
                     if (message.operation == 'create') {
                         try {
                             if (message.model.fromUser.username != this.ircConfig.gitterNickname) {
-                                MessageParser.parseMessage(message.model.html, (message) => {
-                                    this.ircClient.say(item.ircChannel, entities.decode(Strip(message)));
+                                MessageParser.parseMessage(message.model.html, this.ircClient, item.ircChannel, (sendToIrc, message) => {
+                                    if (sendToIrc) {
+                                        this.ircClient.say(item.ircChannel, entities.decode(Strip(message)));
+                                    } else {
+                                        room.send(message);
+                                    }
                                 });
                             }
                         } catch (err) {
@@ -84,6 +88,19 @@ class Gitter2Irc {
             });
         });
 
+        this.ircClient.on('error', (message) => {
+            if (typeof this.pmChannel != 'undefined') {
+                this.pmChannel.send(JSON.stringify(message));
+            }
+            console.log(message);
+        });
+
+        if (typeof this.ircConfig.debug != 'undefined' && this.ircConfig.debug == true) {
+            this.ircClient.on('raw', (message) => {
+                console.log(message);
+            });
+        }
+
         this.ircClient.on('kick', (channel, nick, by, reason) => {
             if (typeof channels[channel] != 'undefined' && nick != this.ircNick) {
                 this.sendGitterWebhookMessage(channels[channel], "**KICK**: " + nick.toString() + ' Reason: ' + reason.toString() + ', by: ' + by.toString());
@@ -92,10 +109,8 @@ class Gitter2Irc {
     }
 
     initPmChannel() {
-        var pmChannel;
-
         this.gitter.rooms.join(this.ircConfig.gitterPmChannel, (err, room) => {
-            pmChannel = room;
+            this.pmChannel = room;
 
             var events = room.streaming().chatMessages();
 
@@ -109,7 +124,10 @@ class Gitter2Irc {
                                 for (var i = 1; i < splitText.length; i++) {
                                     messageStr = messageStr + ":" + splitText[i];
                                 }
+                                this.lastPmUser = splitText[0];
                                 this.ircClient.say(splitText[0], messageStr);
+                            } else if(typeof this.lastPmUser != 'undefined') {
+                                this.ircClient.say(this.lastPmUser, message.model.text);
                             }
                         }
                     } catch (err) {
@@ -120,7 +138,7 @@ class Gitter2Irc {
         });
 
         this.ircClient.addListener('pm', (from, message) => {
-            pmChannel.send("**" + from + ":** " + message);
+            this.pmChannel.send("**" + from + ":** " + message);
         });
     }
 

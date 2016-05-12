@@ -25,14 +25,34 @@ class Message {
         }
     }
 
-    parseMessage(messageHtml, callback) {
-        this.getCode(messageHtml, (code) => {
-            if (code == false) {
-                callback(messageHtml);
-            } else {
-                callback(code);
-            }
-        });
+    parseMessage(messageHtml, ircClient, channel, callback) {
+        switch (true) {
+            case messageHtml.indexOf('/chlist') == 0:
+                if (typeof ircClient.chans[channel] != 'undefined') {
+                    var str = "Currently Online users:\n";
+
+                    Object.keys(ircClient.chans[channel].users).forEach((user) => {
+                        str += '**' + user + "\n";
+                    });
+
+                    callback(false, str);
+                }
+                break;
+            case messageHtml.indexOf('/whois') == 0:
+                ircClient.whois(messageHtml.replace('/whois'), (message) => {
+                    callback(false, message.toString());
+                });
+                break;
+            default:
+                this.getCode(messageHtml, (code) => {
+                    if (code == false) {
+                        callback(true, messageHtml);
+                    } else {
+                        callback(true, code);
+                    }
+                });
+                break;
+        }
     }
 }
 
