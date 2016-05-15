@@ -1,3 +1,5 @@
+[![Dependency Status](https://david-dm.org/shyim/irc2gitter.svg)](https://david-dm.org/shyim/irc2gitter)
+
 Irc2Gitter is a bridge between irc servers and gitter, that allows you to communicate between irc and gitter.
 
 # Installation
