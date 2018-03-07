@@ -3,6 +3,8 @@
 Irc2Gitter is a bridge between irc servers and gitter, that allows you to communicate between irc and gitter.
 
 # Installation
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/shyim/Irc2Gitter.svg)](https://greenkeeper.io/)
 The easist way to install irc2gitter is using the npm package manager
 ```
 npm install -g irc2gitter
